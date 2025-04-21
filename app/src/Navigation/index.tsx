@@ -1,13 +1,13 @@
-import React from 'react';
 import 'react-native-gesture-handler';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import {
-  StaticParamList,
   createNavigationContainerRef,
   createStaticNavigation,
+  StaticParamList,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { DefaultNavBar } from '../components/NavBar';
 import AppLayout from '../layouts/AppLayout';
@@ -21,6 +21,7 @@ import aesopScreens from './aesop';
 import homeScreens from './home';
 import passportScreens from './passport';
 import proveScreens from './prove';
+import recoveryScreens from './recovery';
 import settingsScreens from './settings';
 import staticScreens from './static';
 
@@ -39,6 +40,7 @@ const AppNavigation = createNativeStackNavigator({
     ...proveScreens,
     ...accountScreens,
     ...settingsScreens,
+    ...recoveryScreens,
     ...aesopScreens,
   },
 });
