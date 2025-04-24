@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import React, {
   useCallback,
@@ -24,27 +24,16 @@ import Disclosures from '../../components/Disclosures';
 import { BodyText } from '../../components/typography/BodyText';
 import { Caption } from '../../components/typography/Caption';
 import { ExpandableBottomLayout } from '../../layouts/ExpandableBottomLayout';
-import { useApp } from '../../stores/appProvider';
-import { usePassport } from '../../stores/passportDataProvider';
-import {
-  globalSetDisclosureStatus,
-  ProofStatusEnum,
-  useProofInfo,
-} from '../../stores/proofProvider';
+import { useSelfAppStore } from '../../stores/selfAppStore';
 import { black, slate300, white } from '../../utils/colors';
 import { buttonTap } from '../../utils/haptic';
-import {
-  isUserRegistered,
-  sendVcAndDisclosePayload,
-} from '../../utils/proving/payload';
+import { useProvingStore } from '../../utils/proving/provingMachine';
 
 const ProveScreen: React.FC = () => {
   const { navigate } = useNavigation();
-  const { getPassportDataAndSecret } = usePassport();
-  const { selectedApp, resetProof, cleanSelfApp } = useProofInfo();
-  const { handleProofResult } = useApp();
+  const isFocused = useIsFocused();
+  const selectedApp = useSelfAppStore(state => state.selfApp);
   const selectedAppRef = useRef(selectedApp);
-  const isProcessing = useRef(false);
 
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [scrollViewContentHeight, setScrollViewContentHeight] = useState(0);
@@ -55,6 +44,7 @@ const ProveScreen: React.FC = () => {
     () => scrollViewContentHeight <= scrollViewHeight,
     [scrollViewContentHeight, scrollViewHeight],
   );
+  const provingStore = useProvingStore();
 
   /**
    * Whenever the relationship between content height vs. scroll view height changes,
@@ -70,14 +60,16 @@ const ProveScreen: React.FC = () => {
 
   useEffect(() => {
     if (
+      !isFocused ||
       !selectedApp ||
       selectedAppRef.current?.sessionId === selectedApp.sessionId
     ) {
-      return; // Avoid unnecessary updates
+      return; // Avoid unnecessary updates or processing when not focused
     }
     selectedAppRef.current = selectedApp;
     console.log('[ProveScreen] Selected app updated:', selectedApp);
-  }, [selectedApp]);
+    provingStore.init('disclose');
+  }, [selectedApp, isFocused]);
 
   const disclosureOptions = useMemo(() => {
     return (selectedApp?.disclosures as SelfAppDisclosureConfig) || [];
@@ -111,75 +103,13 @@ const ProveScreen: React.FC = () => {
     return formatEndpoint(selectedApp.endpoint);
   }, [selectedApp?.endpoint]);
 
-  const onVerify = useCallback(
-    async function () {
-      if (isProcessing.current) {
-        return;
-      }
-      isProcessing.current = true;
-
-      resetProof();
-      buttonTap();
-      const currentApp = selectedAppRef.current;
-
-      try {
-        let timeToNavigateToStatusScreen: NodeJS.Timeout;
-
-        const passportDataAndSecret = await getPassportDataAndSecret().catch(
-          (e: Error) => {
-            console.error('Error getting passport data', e);
-            globalSetDisclosureStatus?.(ProofStatusEnum.ERROR);
-          },
-        );
-
-        timeToNavigateToStatusScreen = setTimeout(() => {
-          navigate('ProofRequestStatusScreen');
-        }, 200);
-
-        if (!passportDataAndSecret) {
-          console.log('No passport data or secret');
-          globalSetDisclosureStatus?.(ProofStatusEnum.ERROR);
-          setTimeout(() => {
-            navigate('PassportDataNotFound');
-          }, 3000);
-          return;
-        }
-
-        const { passportData, secret } = passportDataAndSecret.data;
-        const isRegistered = await isUserRegistered(passportData, secret);
-        console.log('isRegistered', isRegistered);
-
-        if (!isRegistered) {
-          clearTimeout(timeToNavigateToStatusScreen);
-          console.log(
-            'User is not registered, sending to ConfirmBelongingScreen',
-          );
-          navigate('ConfirmBelongingScreen');
-          cleanSelfApp();
-          return;
-        }
-
-        console.log('currentApp', currentApp);
-        const status = await sendVcAndDisclosePayload(
-          secret,
-          passportData,
-          currentApp,
-        );
-        handleProofResult(
-          currentApp.sessionId,
-          status?.status === ProofStatusEnum.SUCCESS,
-          status?.error_code,
-          status?.reason,
-        );
-      } catch (e) {
-        console.log('Error in verification process');
-        globalSetDisclosureStatus?.(ProofStatusEnum.ERROR);
-      } finally {
-        isProcessing.current = false;
-      }
-    },
-    [navigate, getPassportDataAndSecret, handleProofResult, resetProof],
-  );
+  function onVerify() {
+    provingStore.setUserConfirmed();
+    buttonTap();
+    setTimeout(() => {
+      navigate('ProofRequestStatusScreen');
+    }, 200);
+  }
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -215,7 +145,7 @@ const ProveScreen: React.FC = () => {
     <ExpandableBottomLayout.Layout flex={1} backgroundColor={black}>
       <ExpandableBottomLayout.TopSection backgroundColor={black}>
         <YStack alignItems="center">
-          {!selectedApp.sessionId ? (
+          {!selectedApp?.sessionId ? (
             <LottieView
               source={miscAnimation}
               autoPlay
@@ -272,13 +202,13 @@ const ProveScreen: React.FC = () => {
               paddingBottom={20}
             >
               Self will confirm that these details are accurate and none of your
-              confidential info will be revealed to {selectedApp.appName}
+              confidential info will be revealed to {selectedApp?.appName}
             </Caption>
           </View>
         </ScrollView>
         <HeldPrimaryButton
           onPress={onVerify}
-          disabled={!selectedApp.sessionId || !hasScrolledToBottom}
+          disabled={!selectedApp?.sessionId || !hasScrolledToBottom}
         >
           {hasScrolledToBottom
             ? 'Hold To Verify'

@@ -10,6 +10,7 @@ import useHapticNavigation from '../../hooks/useHapticNavigation';
 import { ExpandableBottomLayout } from '../../layouts/ExpandableBottomLayout';
 import { black, white } from '../../utils/colors';
 import { notificationSuccess } from '../../utils/haptic';
+import { useProvingStore } from '../../utils/proving/provingMachine';
 import { styles } from '../ProveFlow/ProofRequestStatusScreen';
 
 type ConfirmBelongingScreenProps = StaticScreenProps<
@@ -23,14 +24,33 @@ const ConfirmBelongingScreen: React.FC<ConfirmBelongingScreenProps> = ({
   route,
 }) => {
   const mockPassportFlow = route.params?.mockPassportFlow;
-  const onOkPress = useHapticNavigation('LoadingScreen', {
+  const navigate = useHapticNavigation('LoadingScreen', {
     params: {
       mockPassportFlow,
     },
   });
+  const provingStore = useProvingStore();
+
   useEffect(() => {
     notificationSuccess();
+    provingStore.init('dsc');
   }, []);
+
+  const onOkPress = async () => {
+    // Initialize the proving process just before navigation
+    // This ensures a fresh start each time
+    try {
+      // Initialize the state machine
+
+      // Mark as user confirmed - proving will start automatically when ready
+      provingStore.setUserConfirmed();
+
+      // Navigate to loading screen
+      navigate();
+    } catch (error) {
+      console.error('Error initializing proving process:', error);
+    }
+  };
 
   // Prevents back navigation
   usePreventRemove(true, () => {});
