@@ -168,7 +168,10 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       if (state.value === 'post_proving') {
         get().postProving();
       }
-      if (get().circuitType !== 'disclose' && state.value === 'error') {
+      if (
+        get().circuitType !== 'disclose' &&
+        (state.value === 'error' || state.value === 'failure')
+      ) {
         setTimeout(() => {
           if (navigationRef.isReady()) {
             navigationRef.navigate('Launch');
