@@ -219,8 +219,8 @@ const ProofHistoryScreen: React.FC = () => {
                     {formatDate(item.timestamp)}
                   </BodyText>
                 </YStack>
-                {(item.endpointType == 'staging_celo' ||
-                  item.endpointType == 'celo') && (
+                {(item.endpointType === 'staging_celo' ||
+                  item.endpointType === 'celo') && (
                   <XStack
                     backgroundColor={blue100}
                     paddingVertical={2}
