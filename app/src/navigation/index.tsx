@@ -14,8 +14,7 @@ import AppLayout from '../layouts/AppLayout';
 import analytics from '../utils/analytics';
 import { white } from '../utils/colors';
 import { setupUniversalLinkListenerInNavigation } from '../utils/deeplinks';
-import accountScreens from './account';
-import aesopScreens from './aesop';
+import { getAesopScreens } from './aesop';
 import devScreens from './dev';
 import homeScreens from './home';
 import passportScreens from './passport';
@@ -24,25 +23,26 @@ import recoveryScreens from './recovery';
 import settingsScreens from './settings';
 import staticScreens from './static';
 
+export const navigationScreens = {
+  ...staticScreens,
+  ...passportScreens,
+  ...homeScreens,
+  ...proveScreens,
+  ...settingsScreens,
+  ...recoveryScreens,
+  ...devScreens,
+  // add last to override other screens
+  ...getAesopScreens(),
+};
+
 const AppNavigation = createNativeStackNavigator({
   initialRouteName: 'Splash',
-  orientation: 'portrait_up',
   screenOptions: {
     header: DefaultNavBar,
     navigationBarColor: white,
   },
   layout: AppLayout,
-  screens: {
-    ...staticScreens,
-    ...passportScreens,
-    ...homeScreens,
-    ...proveScreens,
-    ...accountScreens,
-    ...settingsScreens,
-    ...recoveryScreens,
-    ...devScreens,
-    ...aesopScreens,
-  },
+  screens: navigationScreens,
 });
 
 export type RootStackParamList = StaticParamList<typeof AppNavigation>;

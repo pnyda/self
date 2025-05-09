@@ -1,10 +1,11 @@
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
-import AccountRecoveryChoiceScreen from '../screens/AccountFlow/AccountRecoveryChoiceScreen';
-import AccountRecoveryScreen from '../screens/AccountFlow/AccountRecoveryScreen';
-import AccountVerifiedSuccessScreen from '../screens/AccountFlow/AccountVerifiedSuccessScreen';
-import RecoverWithPhraseScreen from '../screens/AccountFlow/RecoverWithPhraseScreen';
-import SaveRecoveryPhraseScreen from '../screens/AccountFlow/SaveRecoveryPhraseScreen';
+import AccountRecoveryChoiceScreen from '../screens/recovery/AccountRecoveryChoiceScreen';
+import AccountRecoveryScreen from '../screens/recovery/AccountRecoveryScreen';
+import AccountVerifiedSuccessScreen from '../screens/recovery/AccountVerifiedSuccessScreen';
+import PassportDataNotFound from '../screens/recovery/PassportDataNotFoundScreen';
+import RecoverWithPhraseScreen from '../screens/recovery/RecoverWithPhraseScreen';
+import SaveRecoveryPhraseScreen from '../screens/recovery/SaveRecoveryPhraseScreen';
 import { black, slate300 } from '../utils/colors';
 
 const recoveryScreens = {
@@ -20,11 +21,20 @@ const recoveryScreens = {
       headerShown: false,
     } as NativeStackNavigationOptions,
   },
-  SaveRecoveryPhrase: {
-    screen: SaveRecoveryPhraseScreen,
+  AccountVerifiedSuccess: {
+    screen: AccountVerifiedSuccessScreen,
     options: {
       headerShown: false,
       animation: 'slide_from_bottom',
+    } as NativeStackNavigationOptions,
+  },
+  PassportDataNotFound: {
+    screen: PassportDataNotFound,
+    options: {
+      headerShown: false,
+      gestureEnabled: false,
+      animation: 'slide_from_bottom',
+      // presentation: 'modal',
     } as NativeStackNavigationOptions,
   },
   RecoverWithPhrase: {
@@ -41,8 +51,8 @@ const recoveryScreens = {
       headerBackTitle: 'close',
     } as NativeStackNavigationOptions,
   },
-  AccountVerifiedSuccess: {
-    screen: AccountVerifiedSuccessScreen,
+  SaveRecoveryPhrase: {
+    screen: SaveRecoveryPhraseScreen,
     options: {
       headerShown: false,
       animation: 'slide_from_bottom',
