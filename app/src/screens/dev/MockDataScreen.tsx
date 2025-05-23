@@ -213,6 +213,7 @@ const MockDataScreen: React.FC<MockDataScreenProps> = ({}) => {
         ][2];
 
       const idDocInput: Partial<IdDocInput> = {
+        nationality: selectedCountry,
         idType: 'mock_passport',
         signatureType:
           signatureTypeForGeneration as IdDocInput['signatureType'],
