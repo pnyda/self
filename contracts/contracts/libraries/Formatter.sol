@@ -124,9 +124,7 @@ library Formatter {
         return bytesArray;
     }
 
-    function fieldElementsToBytesIdCard(
-        uint256[4] memory publicSignals
-    ) internal pure returns (bytes memory) {
+    function fieldElementsToBytesIdCard(uint256[4] memory publicSignals) internal pure returns (bytes memory) {
         if (
             publicSignals[0] >= SNARK_SCALAR_FIELD ||
             publicSignals[1] >= SNARK_SCALAR_FIELD ||
