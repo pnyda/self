@@ -5,6 +5,7 @@
     "type": "git",
     "url": "https://github.com/selfxyz/self"
   },
+  "type": "commonjs",
   "license": "MIT",
   "author": "motemotech <i.am.nicoshark@gmail.com>",
   "files": [
@@ -14,6 +15,7 @@
     "contracts/abstract/*"
   ],
   "scripts": {
+    "types": "tsc -noEmit",
     "build": "npx hardhat clean && npx hardhat compile",
     "deploy:all": "npm run deploy:verifiers:all && npm run deploy:registry && npm run deploy:registry:idcard && npm run deploy:hub:v2",
     "deploy:hub": "npx dotenv-cli -- bash -c 'npx hardhat ignition deploy ignition/modules/hub/deployHub.ts --network ${NETWORK:-localhost} ${VERIFY:+--verify}'",
@@ -64,6 +66,7 @@
     "@openpassport/zk-kit-smt": "^0.0.1",
     "@openzeppelin/contracts": "^5.0.2",
     "@openzeppelin/contracts-upgradeable": "^5.1.0",
+    "@selfxyz/common": "workspace:",
     "@types/circomlibjs": "^0.1.6",
     "@types/jest": "^29.5.12",
     "@zk-kit/imt": "^2.0.0-beta.4",

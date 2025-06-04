@@ -1,13 +1,13 @@
+import { WS_RPC_URL_VC_AND_DISCLOSE } from '@selfxyz/common';
+import { EndpointType, SelfApp } from '@selfxyz/common';
+import { getCircuitNameFromPassportData } from '@selfxyz/common';
+import { PassportData } from '@selfxyz/common';
 import forge from 'node-forge';
 import io, { Socket } from 'socket.io-client';
 import { v4 } from 'uuid';
 import { AnyActorRef, createActor, createMachine } from 'xstate';
 import { create } from 'zustand';
 
-import { WS_RPC_URL_VC_AND_DISCLOSE } from '../../../../common/src/constants/constants';
-import { EndpointType, SelfApp } from '../../../../common/src/utils/appType';
-import { getCircuitNameFromPassportData } from '../../../../common/src/utils/circuits/circuitsName';
-import { PassportData } from '../../../../common/src/utils/types';
 import { navigationRef } from '../../navigation';
 import {
   clearPassportData,

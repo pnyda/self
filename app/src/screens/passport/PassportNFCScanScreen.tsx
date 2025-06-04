@@ -1,4 +1,7 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { getSKIPEM } from '@selfxyz/common';
+import { initPassportDataParsing } from '@selfxyz/common';
+import { PassportData } from '@selfxyz/common';
 import LottieView from 'lottie-react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -11,9 +14,6 @@ import {
 import NfcManager from 'react-native-nfc-manager';
 import { Image } from 'tamagui';
 
-import { getSKIPEM } from '../../../../common/src/utils/csca';
-import { initPassportDataParsing } from '../../../../common/src/utils/passports/passport';
-import { PassportData } from '../../../../common/src/utils/types';
 import passportVerifyAnimation from '../../assets/animations/passport_verify.json';
 import { PrimaryButton } from '../../components/buttons/PrimaryButton';
 import { SecondaryButton } from '../../components/buttons/SecondaryButton';
