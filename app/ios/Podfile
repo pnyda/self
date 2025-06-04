@@ -27,10 +27,12 @@ target "Self" do
   config = use_native_modules!
 
   use_frameworks!
-  pod "NFCPassportReader", git: "https://github.com/zk-passport/NFCPassportReader", commit: "e3e869b14fb7fb2417928079db3967f203523580"
+  pod "NFCPassportReader", git: "https://github.com/seshanthS/NFCPassportReader", commit: "d365b2366d87a1cbe6d16c249ff709d63f6b6f61"
+
   pod "QKMRZScanner"
   pod "lottie-ios"
   pod "SwiftQRScanner", :git => "https://github.com/vinodiOS/SwiftQRScanner"
+  pod "Mixpanel-swift", "~> 5.0.0"
   pod "RNReactNativeHapticFeedback", :path => "../../node_modules/react-native-haptic-feedback", :modular_headers => true
 
   use_react_native!(
