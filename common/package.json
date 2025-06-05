@@ -1,5 +1,5 @@
 {
-  "name": "@openpassport/common",
+  "name": "@self/common",
   "version": "0.0.2",
   "description": "Constants and utils for self sdks",
   "license": "MIT",
