@@ -13,7 +13,11 @@ import {
 } from './utils/passports/passport.js';
 import { parseDscCertificateData } from './utils/passports/passport_parsing/parseDscCertificateData.js';
 import { getLeafCscaTree, getLeafDscTree } from './utils/trees.js';
-import { genMockIdDoc, IdDocInput } from './utils/passports/genMockIdDoc.js';
+import {
+  genMockIdDoc,
+  genMockIdDocAndInitDataParsing,
+  IdDocInput,
+} from './utils/passports/genMockIdDoc.js';
 import { brutforceSignatureAlgorithmDsc } from './utils/passports/passport_parsing/brutForceDscSignature.js';
 export { initElliptic } from './utils/certificate_parsing/elliptic.js';
 export { getSKIPEM } from './utils/csca.js';
@@ -24,7 +28,7 @@ export * from './constants/countries.js';
 export * from './constants/constants.js';
 export * from './utils/appType.js';
 export * from './utils/scope.js';
-export type { PassportData, DocumentType } from './utils/types.js';
+export type { PassportData, DocumentType, DocumentCategory } from './utils/types.js';
 export type Country3LetterCode = Country3LetterCode1 & Country3LetterCode2;
 export { initPassportDataParsing } from './utils/passports/passport.js';
 export { genAndInitMockPassportData } from './utils/passports/genMockPassportData.js';
@@ -53,4 +57,5 @@ export {
   PublicKeyDetailsECDSA,
   PublicKeyDetailsRSA,
   genMockIdDoc,
+  genMockIdDocAndInitDataParsing,
 };

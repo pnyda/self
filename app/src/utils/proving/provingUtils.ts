@@ -44,7 +44,7 @@ export type TEEPayloadDisclose = {
 };
 
 export type TEEPayload = {
-  type: 'register' | 'dsc';
+  type: 'register' | 'dsc' | 'register_id' | 'dsc_id';
   onchain: true;
   endpointType: string;
   circuit: {
@@ -55,7 +55,7 @@ export type TEEPayload = {
 
 export function getPayload(
   inputs: any,
-  circuitType: 'register' | 'dsc' | 'disclose',
+  circuitType: 'register' | 'dsc' | 'disclose' | 'register_id' | 'dsc_id',
   circuitName: string,
   endpointType: EndpointType,
   endpoint: string,
@@ -74,7 +74,7 @@ export function getPayload(
     return payload;
   } else {
     const payload: TEEPayload = {
-      type: circuitType as 'register' | 'dsc',
+      type: circuitType as 'register' | 'dsc' | 'register_id' | 'dsc_id',
       onchain: true,
       endpointType: endpointType,
       circuit: {

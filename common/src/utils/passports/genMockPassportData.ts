@@ -109,6 +109,8 @@ export function genMockPassportData(
     signedAttr: signedAttr,
     encryptedDigest: signatureBytes,
     documentType: 'mock_passport',
+    documentCategory: 'passport',
+    mock: true,
   };
 }
 

@@ -11,6 +11,7 @@ import {
   PASSPORT_ATTESTATION_ID,
   type PassportData,
 } from '@selfxyz/common';
+import { DocumentCategory } from '@selfxyz/common';
 import { poseidon2, poseidon5 } from 'poseidon-lite';
 
 import { useProtocolStore } from '../../stores/protocolStore';
@@ -28,6 +29,7 @@ export async function checkPassportSupported(
   details: string;
 }> {
   const passportMetadata = passportData.passportMetadata;
+  const document: DocumentCategory = passportData.documentCategory;
   if (!passportMetadata) {
     console.log('Passport metadata is null');
     return { status: 'passport_metadata_missing', details: passportData.dsc };
@@ -41,11 +43,13 @@ export async function checkPassportSupported(
     'register',
   );
   const deployedCircuits =
-    useProtocolStore.getState().passport.deployed_circuits;
-  console.log('circuitNameRegister', circuitNameRegister);
+    useProtocolStore.getState()[document].deployed_circuits; // change this to the document type
   if (
     !circuitNameRegister ||
-    !deployedCircuits.REGISTER.includes(circuitNameRegister)
+    !(
+      deployedCircuits.REGISTER.includes(circuitNameRegister) ||
+      deployedCircuits.REGISTER_ID.includes(circuitNameRegister)
+    )
   ) {
     return {
       status: 'registration_circuit_not_supported',
@@ -53,7 +57,13 @@ export async function checkPassportSupported(
     };
   }
   const circuitNameDsc = getCircuitNameFromPassportData(passportData, 'dsc');
-  if (!circuitNameDsc || !deployedCircuits.DSC.includes(circuitNameDsc)) {
+  if (
+    !circuitNameDsc ||
+    !(
+      deployedCircuits.DSC.includes(circuitNameDsc) ||
+      deployedCircuits.DSC_ID.includes(circuitNameDsc)
+    )
+  ) {
     console.log('DSC circuit not supported:', circuitNameDsc);
     return { status: 'dsc_circuit_not_supported', details: circuitNameDsc };
   }
@@ -73,7 +83,8 @@ export async function isUserRegistered(
     PASSPORT_ATTESTATION_ID,
     passportData,
   );
-  const serializedTree = useProtocolStore.getState().passport.commitment_tree;
+  const document: DocumentCategory = passportData.documentCategory;
+  const serializedTree = useProtocolStore.getState()[document].commitment_tree;
   const tree = LeanIMT.import((a, b) => poseidon2([a, b]), serializedTree);
   const index = tree.indexOf(BigInt(commitment));
   return index !== -1;
@@ -112,7 +123,7 @@ export async function isUserRegisteredWithAlternativeCSCA(
       return { isRegistered: true, csca: csca_list[i] };
     }
   }
-  console.error(
+  console.warn(
     'None of the following CSCA correspond to the commitment:',
     csca_list,
   );

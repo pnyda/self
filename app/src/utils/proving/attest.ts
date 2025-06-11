@@ -168,8 +168,11 @@ export const verifyAttestation = async (attestation: Array<number>) => {
   const cert = derToPem(attestationDoc.certificate);
   const isPCR0Set = await checkPCR0Mapping(attestation);
   console.log('isPCR0Set', isPCR0Set);
-  if (!isPCR0Set) {
+  if (!isPCR0Set && !__DEV__) {
     throw new Error('Invalid image hash');
+  }
+  if (__DEV__ && !isPCR0Set) {
+    console.warn('\x1b[31m%s\x1b[0m', '⚠️  WARNING: PCR0 CHECK SKIPPED ⚠️');
   }
   console.log('TEE image hash verified');
 

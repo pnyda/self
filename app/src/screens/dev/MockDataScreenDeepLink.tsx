@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { countryCodes } from '@selfxyz/common';
-import { genMockIdDoc, IdDocInput } from '@selfxyz/common';
+import { genMockIdDocAndInitDataParsing, IdDocInput } from '@selfxyz/common';
 import { flag } from 'country-emoji';
 import getCountryISO2 from 'country-iso-3-to-2';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -62,7 +62,7 @@ const MockDataScreenDeepLink: React.FC = () => {
       lastName: storeState.deepLinkSurname,
       birthDate: storeState.deepLinkBirthDate,
     };
-    const passportData = genMockIdDoc(idDocInput);
+    const passportData = genMockIdDocAndInitDataParsing(idDocInput);
     await storePassportData(passportData);
     navigation.navigate('ConfirmBelongingScreen', {});
     useUserStore.getState().clearDeepLinkUserDetails();
