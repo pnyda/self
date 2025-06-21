@@ -76,6 +76,19 @@ contract TestSelfVerificationRoot is SelfVerificationRoot {
         _setScope(newScope);
     }
 
+    function setVerificationConfig(SelfStructs.VerificationConfigV2 memory config) external {
+        verificationConfig = config;
+        _identityVerificationHubV2.setVerificationConfigV2(verificationConfig);
+    }
+
+    function getConfigId(
+        bytes32 destinationChainId,
+        bytes32 userIdentifier,
+        bytes memory userDefinedData
+    ) public view override returns (bytes32) {
+        return _identityVerificationHubV2.generateConfigId(verificationConfig);
+    }
+
     /**
      * @notice Test function to simulate calling onVerificationSuccess from hub
      * @dev This function is only for testing purposes to verify access control
