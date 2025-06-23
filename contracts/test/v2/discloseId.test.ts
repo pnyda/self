@@ -21,7 +21,7 @@ function calculateUserIdentifierHash(userContextData: string): string {
     .update(Buffer.from(userContextData.slice(2), "hex"))
     .digest();
   const ripemdHash = createHash("ripemd160").update(sha256Hash).digest();
-  return '0x' + ripemdHash.toString("hex").padStart(40, "0");
+  return "0x" + ripemdHash.toString("hex").padStart(40, "0");
 }
 
 describe("Self Verification Flow V2 - ID Card", () => {

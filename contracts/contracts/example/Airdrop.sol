@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+ // // SPDX-License-Identifier: MIT
+// pragma solidity 0.8.28;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -9,7 +9,7 @@ import {AttestationId} from "../constants/AttestationId.sol";
 import {CircuitAttributeHandlerV2} from "../libraries/CircuitAttributeHandlerV2.sol";
 import {Formatter} from "../libraries/Formatter.sol";
 
-import {SelfVerificationRoot} from "../abstract/SelfVerificationRoot.sol";
+// import {SelfVerificationRoot} from "../abstract/SelfVerificationRoot.sol";
 
 /**
  * @title SelfHappyBirthday V2
@@ -47,9 +47,9 @@ contract SelfHappyBirthday is SelfVerificationRoot, Ownable {
     /// @notice Tracks users who have claimed to prevent double claims
     mapping(uint256 nullifier => bool hasClaimed) public hasClaimed;
 
-    // ====================================================
-    // Events
-    // ====================================================
+//     // ====================================================
+//     // Events
+//     // ====================================================
 
     event USDCClaimed(address indexed claimer, uint256 amount, bytes32 attestationId);
     event ClaimableAmountUpdated(uint256 oldAmount, uint256 newAmount);
@@ -77,9 +77,9 @@ contract SelfHappyBirthday is SelfVerificationRoot, Ownable {
         usdc = IERC20(token);
     }
 
-    // ====================================================
-    // External/Public Functions
-    // ====================================================
+//     // ====================================================
+//     // External/Public Functions
+//     // ====================================================
 
     /**
      * @notice Sets the claimable USDC amount
@@ -120,9 +120,9 @@ contract SelfHappyBirthday is SelfVerificationRoot, Ownable {
         usdc.safeTransfer(to, amount);
     }
 
-    // ====================================================
-    // Override Functions from SelfVerificationRoot
-    // ====================================================
+//     // ====================================================
+//     // Override Functions from SelfVerificationRoot
+//     // ====================================================
 
     /**
      * @notice Hook called after successful verification
@@ -163,9 +163,9 @@ contract SelfHappyBirthday is SelfVerificationRoot, Ownable {
         }
     }
 
-    // ====================================================
-    // Internal Functions
-    // ====================================================
+//     // ====================================================
+//     // Internal Functions
+//     // ====================================================
 
     /**
      * @notice Checks if the current date is within the user's birthday window
