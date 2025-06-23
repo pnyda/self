@@ -21,8 +21,8 @@ function getHubImplV2InitializeData() {
  * 3. IdentityVerificationHub - The proxy contract pointing to the implementation
  *
  * Usage:
- * - Deploy: `npx hardhat ignition deploy ignition/modules/deployV2.ts --network <network-name>`
- * - Deploy and verify: `npx hardhat ignition deploy ignition/modules/deployV2.ts --network <network-name> --verify`
+ * - Deploy: `npx hardhat ignition deploy ignition/modules/hub/deployHubV2.ts --network <network-name>`
+ * - Deploy and verify: `npx hardhat ignition deploy ignition/modules/hub/deployHubV2.ts --network <network-name> --verify`
  * - The proxy will be initialized with the V2 implementation
  * - Circuit version is automatically set to 2 during initialization
  * - After deployment, use the update functions to configure:
@@ -35,8 +35,37 @@ function getHubImplV2InitializeData() {
  * 2. Configure circuit verifiers for different signature types
  * 3. Set up verification configurations using setVerificationConfigV2()
  * 4. Transfer ownership to the appropriate address if needed
+ *
+ * Troubleshooting Verification Issues:
+ * If contracts are not verified during deployment (common with API issues):
+ * 
+ * 1. Manual verification for CustomVerifier library:
+ *    `npx hardhat verify --network <network-name> <CUSTOM_VERIFIER_ADDRESS>`
+ * 
+ * 2. Manual verification for IdentityVerificationHubImplV2 (requires library linkage):
+ *    Create a libraries file (e.g., verify-libs.js):
+ *    ```
+ *    module.exports = {
+ *      "contracts/libraries/CustomVerifier.sol:CustomVerifier": "<CUSTOM_VERIFIER_ADDRESS>"
+ *    };
+ *    ```
+ *    Then verify: `npx hardhat verify --network <network-name> --libraries verify-libs.js <IMPL_V2_ADDRESS>`
+ * 
+ * 3. Manual verification for proxy contract:
+ *    `npx hardhat verify --network <network-name> <PROXY_ADDRESS> <IMPL_V2_ADDRESS> <INIT_DATA>`
+ * 
+ * 4. Alternative verification command:
+ *    `npx hardhat ignition verify chain-<chainId> --include-unrelated-contracts`
+ * 
+ * Common verification failure reasons:
+ * - API rate limits or temporary service issues
+ * - Library linkage not properly detected
+ * - Etherscan API v1/v2 configuration issues
+ * 
+ * Note: Verification failures do NOT affect contract functionality - contracts work normally even if unverified.
+ * Verification only affects source code display on block explorers.
  */
-export default buildModule("DeployV2", (m) => {
+export default buildModule("DeployHubV2", (m) => {
   // Deploy the CustomVerifier library
   const customVerifier = m.library("CustomVerifier");
 
