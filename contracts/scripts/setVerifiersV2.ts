@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
-import { RegisterVerifierId, DscVerifierId } from "../../common/src/constants/constants";
+import { RegisterVerifierId, DscVerifierId } from "@selfxyz/common";
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ console.log(
 
 // Debug logs for environment variables (redacted for security)
 console.log("CELO_RPC_URL configured:", !!process.env.CELO_ALFAJORES_RPC_URL);
-console.log("CELO_KEY configured:", !!process.env.CELO_KEY);
+console.log("CELO_KEY configured:", !!process.env.PRIVATE_KEY);
 
 try {
   const deployedAddresses = JSON.parse(
@@ -67,7 +67,7 @@ try {
     const provider = new ethers.JsonRpcProvider(process.env.CELO_ALFAJORES_RPC_URL as string);
     console.log("Provider created");
 
-    const wallet = new ethers.Wallet(process.env.CELO_KEY as string, provider);
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string, provider);
     console.log("Wallet created");
 
     // const hubAddress = deployedAddresses["DeployHub#IdentityVerificationHub"];
@@ -92,6 +92,7 @@ try {
       }
 
       const registryAddress = getContractAddressByExactName(registryName);
+      console.log("Registry address:", registryAddress);
 
       if (!registryAddress) {
         console.log(`Skipping registry update for ${attestationType} because no deployed address was found.`);
