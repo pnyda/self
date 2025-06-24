@@ -46,6 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_AUTH_TOKEN }}
+          yarn config set npmPublishAccess public
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
