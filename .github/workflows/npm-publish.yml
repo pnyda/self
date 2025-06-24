@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -56,10 +56,6 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/yarn-install
-        
-      - run: |
-          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_AUTH_TOKEN }}
-          yarn config set npmPublishAccess public
 
       - name: Build package
         run: |
@@ -68,6 +64,8 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/core
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
