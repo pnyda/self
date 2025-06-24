@@ -63,7 +63,7 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/core
         run: |
-          npm publish --access public
+          yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -91,7 +91,7 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/qrcode
         run: |
-          npm publish --access public
+          yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -118,7 +118,7 @@ jobs:
       - name: Publish to npm
         working-directory: common
         run: |
-          npm publish --access public
+          yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
