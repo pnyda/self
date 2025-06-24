@@ -5,8 +5,8 @@ import * as path from "path";
 
 
 const deployVerifiers = {
-  vcAndDiscloseVerifier: true,
-  vcAndDiscloseIdVerifier: false,
+  vcAndDiscloseVerifier: false,
+  vcAndDiscloseIdVerifier: true,
   registerIdVerifier: false,
   registerVerifier: false,
   dscVerifier: false,
