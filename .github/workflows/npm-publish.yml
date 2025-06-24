@@ -8,6 +8,7 @@ on:
       - 'sdk/core/package.json'
       - 'sdk/qrcode/package.json'
       - 'common/package.json'
+  workflow_dispatch:
 
 jobs:
   detect-changes:
