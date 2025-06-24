@@ -3,11 +3,12 @@ name: Publish to npm
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
       - 'sdk/core/package.json'
       - 'sdk/qrcode/package.json'
       - 'common/package.json'
+  workflow_dispatch:
 
 jobs:
   detect-changes:
@@ -46,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -55,6 +56,10 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/yarn-install
+        
+      - run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_AUTH_TOKEN }}
+          yarn config set npmPublishAccess public
 
       - name: Build package
         run: |
@@ -66,6 +71,7 @@ jobs:
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-qrcode:
     needs: detect-changes
@@ -85,7 +91,7 @@ jobs:
 
       - name: Build package
         run: |
-          yarn workspace @sdk/qrcode build:deps
+          yarn workspace @selfxyz/qrcode build:deps
 
       - name: Publish to npm
         working-directory: sdk/qrcode
@@ -93,6 +99,7 @@ jobs:
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-common:
     needs: detect-changes
@@ -119,3 +126,4 @@ jobs:
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

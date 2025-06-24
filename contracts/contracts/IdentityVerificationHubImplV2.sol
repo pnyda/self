@@ -161,6 +161,10 @@ contract IdentityVerificationHubImplV2 is ImplRoot {
     /// @dev Ensures that the user context data hash matches the user identifier in the proof.
     error InvalidUserIdentifierInProof();
 
+    /// @notice Thrown when the verification config is not set.
+    /// @dev Ensures that the verification config is set before performing verification.
+    error ConfigNotSet();
+
     // ====================================================
     // Constructor
     // ====================================================
@@ -626,7 +630,7 @@ contract IdentityVerificationHubImplV2 is ImplRoot {
      */
     function getVerificationConfigV2(
         bytes32 configId
-    ) internal view virtual onlyProxy returns (SelfStructs.VerificationConfigV2 memory) {
+    ) public view virtual onlyProxy returns (SelfStructs.VerificationConfigV2 memory) {
         IdentityVerificationHubV2Storage storage $v2 = _getIdentityVerificationHubV2Storage();
         return $v2._v2VerificationConfigs[configId];
     }
@@ -638,6 +642,10 @@ contract IdentityVerificationHubImplV2 is ImplRoot {
         IdentityVerificationHubV2Storage storage $v2 = _getIdentityVerificationHubV2Storage();
         SelfStructs.VerificationConfigV2 memory verificationConfig = $v2._v2VerificationConfigs[configId];
         config = GenericFormatter.formatV2Config(verificationConfig);
+        if (generateConfigId(verificationConfig) != configId) {
+            revert ConfigNotSet();
+        }
+        return config;
     }
 
     /**

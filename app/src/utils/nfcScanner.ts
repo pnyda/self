@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BUSL-1.1; Copyright (c) 2025 Social Connect Labs, Inc.; Licensed under BUSL-1.1 (see LICENSE); Apache-2.0 from 2029-06-11
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ENABLE_DEBUG_LOGS, MIXPANEL_NFC_PROJECT_TOKEN } from '@env';
 import { PassportData } from '@selfxyz/common';
@@ -34,10 +36,13 @@ export const scan = async (inputs: Inputs) => {
 };
 
 const scanAndroid = async (inputs: Inputs) => {
+  PassportReader.reset();
   return await PassportReader.scan({
     documentNumber: inputs.passportNumber,
     dateOfBirth: inputs.dateOfBirth,
     dateOfExpiry: inputs.dateOfExpiry,
+    canNumber: inputs.canNumber ?? '',
+    useCan: inputs.useCan ?? false,
   });
 };
 

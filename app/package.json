@@ -1,6 +1,6 @@
 {
   "name": "@selfxyz/mobile-app",
-  "version": "2.5.3",
+  "version": "2.5.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -39,6 +39,7 @@
     "install-app:setup": "yarn install && yarn build:deps && cd ios && bundle install && cd ..",
     "ios": "react-native run-ios",
     "ios:fastlane-debug": "yarn reinstall && bundle exec fastlane --verbose ios internal_test",
+    "setup": "yarn clean:build && yarn install && yarn build:deps && cd ios && bundle install && bundle exec pod install --repo-update && cd .. && yarn clean:xcode-env-local",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "nice": "yarn lint:fix && yarn fmt:fix",
@@ -71,6 +72,7 @@
     "@stablelib/cbor": "^2.0.1",
     "@tamagui/config": "1.126.14",
     "@tamagui/lucide-icons": "1.126.14",
+    "@tamagui/toast": "^1.127.2",
     "@xstate/react": "^5.0.3",
     "add": "^2.0.6",
     "asn1js": "^3.0.5",
@@ -93,7 +95,7 @@
     "react-native-cloud-storage": "^2.2.2",
     "react-native-device-info": "^14.0.4",
     "react-native-dotenv": "^3.4.11",
-    "react-native-gesture-handler": "^2.22.1",
+    "react-native-gesture-handler": "2.24.0",
     "react-native-get-random-values": "^1.11.0",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-keychain": "^10.0.0",
