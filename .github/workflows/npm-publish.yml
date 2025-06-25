@@ -29,15 +29,16 @@ jobs:
           git diff HEAD^ HEAD --name-only | grep -q "sdk/qrcode/package.json" && echo "qrcode_changed=true" >> $GITHUB_OUTPUT || echo "qrcode_changed=false" >> $GITHUB_OUTPUT
           git diff HEAD^ HEAD --name-only | grep -q "common/package.json" && echo "common_changed=true" >> $GITHUB_OUTPUT || echo "common_changed=false" >> $GITHUB_OUTPUT
 
-          if git diff HEAD^ HEAD -- sdk/core/package.json | grep -q '"version":'; then
+          # check if it was dispatched manually as well
+          if git diff HEAD^ HEAD -- sdk/core/package.json | grep -q '"version":' || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "core_changed=true" >> $GITHUB_OUTPUT
           fi
 
-          if git diff HEAD^ HEAD -- sdk/qrcode/package.json | grep -q '"version":'; then
+          if git diff HEAD^ HEAD -- sdk/qrcode/package.json | grep -q '"version":' || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "qrcode_changed=true" >> $GITHUB_OUTPUT
           fi
 
-          if git diff HEAD^ HEAD -- common/package.json | grep -q '"version":'; then
+          if git diff HEAD^ HEAD -- common/package.json | grep -q '"version":' || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "common_changed=true" >> $GITHUB_OUTPUT
           fi
 
@@ -47,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -56,10 +57,6 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/yarn-install
-        
-      - run: |
-          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_AUTH_TOKEN }}
-          yarn config set npmPublishAccess public
 
       - name: Build package
         run: |
@@ -68,6 +65,8 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/core
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -96,6 +95,8 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/qrcode
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -123,6 +124,8 @@ jobs:
       - name: Publish to npm
         working-directory: common
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
