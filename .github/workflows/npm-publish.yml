@@ -95,6 +95,8 @@ jobs:
       - name: Publish to npm
         working-directory: sdk/qrcode
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -122,6 +124,8 @@ jobs:
       - name: Publish to npm
         working-directory: common
         run: |
+          yarn config set npmScopes.selfxyz.npmAuthToken ${{ secrets.NPM_TOKEN }}
+          yarn config set npmPublishAccess public
           yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

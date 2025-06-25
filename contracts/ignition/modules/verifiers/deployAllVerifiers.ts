@@ -70,6 +70,25 @@ let successfulDscDeployments = 0;
   });
   }
 
+  // Deploy VC and Disclose ID verifier
+  console.log("Deploying VC and Disclose ID verifier...");
+  deployedContracts.vcAndDiscloseIdVerifier = m.contract("Verifier_vc_and_disclose_id");
+
+  // Deploy Register ID verifiers (for ID cards)
+  console.log("Deploying Register ID verifiers...");
+  const registerIdCircuits = ["register_id_sha256_sha256_sha256_rsa_65537_4096"];
+  let successfulRegisterIdDeployments = 0;
+  registerIdCircuits.forEach((circuitName) => {
+    const contractName = `Verifier_${circuitName}`;
+    if (contractExists(contractName)) {
+      console.log(`  - Deploying ${contractName}`);
+      deployedContracts[circuitName] = m.contract(contractName);
+      successfulRegisterIdDeployments++;
+    } else {
+      console.warn(`  - Warning: Contract ${contractName} not found, skipping...`);
+    }
+  });
+
   // Deploy Register verifiers using RegisterVerifierId enum
   const registerCircuits = getEnumKeys(RegisterVerifierId);
   if (deployVerifiers.registerVerifier) {
