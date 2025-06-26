@@ -795,7 +795,6 @@ export const useProvingStore = create<ProvingState>((set, get) => {
         sharedKey: null,
         uuid: null,
         endpointType: null,
-        env: null,
       });
     },
 
