@@ -161,11 +161,13 @@ export class SelfBackendVerifier {
         message: `Config not found for ${configId}`,
       });
     } finally {
-      issues.push({
-        type: ConfigMismatch.ConfigNotFound,
-        message: `Config not found for ${configId}`,
-      });
-      if (!verificationConfig) throw new ConfigMismatchError(issues);
+      if (!verificationConfig) {
+        issues.push({
+          type: ConfigMismatch.ConfigNotFound,
+          message: `Config not found for ${configId}`,
+        });
+        throw new ConfigMismatchError(issues);
+      }
     }
 
     //check if forbidden countries list matches
