@@ -53,6 +53,7 @@ interface ProofHistoryState {
 const PAGE_SIZE = 20;
 const DB_NAME = Platform.OS === 'ios' ? 'proof_history.db' : 'proof_history.db';
 const TABLE_NAME = 'proof_history';
+const STALE_PROOF_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 export const useProofHistoryStore = create<ProofHistoryState>()((set, get) => {
   const syncProofHistoryStatus = async () => {
@@ -62,6 +63,16 @@ export const useProofHistoryStore = create<ProofHistoryState>()((set, get) => {
         name: DB_NAME,
         location: 'default',
       });
+
+      const tenMinutesAgo = Date.now() - STALE_PROOF_TIMEOUT_MS;
+      const [stalePending] = await db.executeSql(
+        `SELECT sessionId FROM ${TABLE_NAME} WHERE status = ? AND timestamp <= ?`,
+        [ProofStatus.PENDING, tenMinutesAgo],
+      );
+      for (let i = 0; i < stalePending.rows.length; i++) {
+        const { sessionId } = stalePending.rows.item(i);
+        await get().updateProofStatus(sessionId, ProofStatus.FAILURE);
+      }
       const [pendingProofs] = await db.executeSql(`
         SELECT * FROM ${TABLE_NAME} WHERE status = '${ProofStatus.PENDING}'
       `);
