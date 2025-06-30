@@ -6,7 +6,13 @@ module.exports = {
     'plugin:jest/recommended',
   ],
   plugins: ['header', 'jest', 'prettier', 'simple-import-sort'],
-  ignorePatterns: ['ios/', 'android/', 'deployments/', 'node_modules/'],
+  ignorePatterns: [
+    'ios/',
+    'android/',
+    'deployments/',
+    'node_modules/',
+    'metro.config.cjs',
+  ],
   rules: {
     // Import sorting rules
     'simple-import-sort/imports': 'warn',
@@ -15,6 +21,7 @@ module.exports = {
       2,
       'line',
       ' SPDX-License-Identifier: BUSL-1.1; Copyright (c) 2025 Social Connect Labs, Inc.; Licensed under BUSL-1.1 (see LICENSE); Apache-2.0 from 2029-06-11',
+      2,
     ],
 
     // Add prettier rule to show prettier errors as ESLint errors
@@ -35,4 +42,12 @@ module.exports = {
     // Override any ESLint rules that conflict with the TypeScript union type formatting
     '@typescript-eslint/indent': 'off',
   },
+  overrides: [
+    {
+      files: ['*.cjs'],
+      rules: {
+        'header/header': 'off',
+      },
+    },
+  ],
 };
