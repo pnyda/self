@@ -307,9 +307,7 @@ const MockDataScreen: React.FC<MockDataScreenProps> = ({}) => {
                 borderColor={borderColor}
                 borderWidth={1}
                 color={
-                  selectedDocumentType === 'mock_passport'
-                    ? white
-                    : textBlack
+                  selectedDocumentType === 'mock_passport' ? white : textBlack
                 }
               >
                 Passport
@@ -328,9 +326,7 @@ const MockDataScreen: React.FC<MockDataScreenProps> = ({}) => {
                 borderColor={borderColor}
                 borderWidth={1}
                 color={
-                  selectedDocumentType === 'mock_id_card'
-                    ? white
-                    : textBlack
+                  selectedDocumentType === 'mock_id_card' ? white : textBlack
                 }
               >
                 ID Card
