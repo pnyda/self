@@ -24,7 +24,6 @@ import {
 } from '../../providers/passportDataProvider';
 import { useProtocolStore } from '../../stores/protocolStore';
 import { useSelfAppStore } from '../../stores/selfAppStore';
-import { useSettingStore } from '../../stores/settingStore';
 import analytics from '../analytics';
 import { getPublicKey, verifyAttestation } from './attest';
 import {
@@ -51,11 +50,10 @@ import {
 const { trackEvent } = analytics();
 
 export const getPostVerificationRoute = () => {
-  const { cloudBackupEnabled, hasViewedRecoveryPhrase } =
-    useSettingStore.getState();
-  return cloudBackupEnabled || hasViewedRecoveryPhrase
-    ? 'AccountVerifiedSuccess'
-    : 'SaveRecoveryPhrase';
+  return 'AccountVerifiedSuccess';
+  // disable for now
+  // const { cloudBackupEnabled } = useSettingStore.getState();
+  // return cloudBackupEnabled ? 'AccountVerifiedSuccess' : 'SaveRecoveryPhrase';
 };
 
 const provingMachine = createMachine({
@@ -236,7 +234,7 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       if (state.value === 'completed') {
         if (get().circuitType !== 'disclose' && navigationRef.isReady()) {
           setTimeout(() => {
-            navigationRef.navigate(getPostVerificationRoute());
+            navigationRef.navigate('AccountVerifiedSuccess');
           }, 3000);
         }
         if (get().circuitType === 'disclose') {
@@ -765,18 +763,9 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       _checkActorInitialized(actor);
       const { circuitType } = get();
       if (circuitType === 'dsc') {
-        const { hasViewedRecoveryPhrase } = useSettingStore.getState();
-        if (!hasViewedRecoveryPhrase) {
-          if (navigationRef.isReady()) {
-            navigationRef.navigate('SaveRecoveryPhrase', {
-              nextScreen: 'LoadingScreen',
-            });
-          }
-        } else {
-          setTimeout(() => {
-            get().init('register', true);
-          }, 3000);
-        }
+        setTimeout(() => {
+          get().init('register', true);
+        }, 1500);
       } else if (circuitType === 'register') {
         actor!.send({ type: 'COMPLETED' });
       } else if (circuitType === 'disclose') {

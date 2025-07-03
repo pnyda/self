@@ -7,6 +7,7 @@ import { usePassport } from '../providers/passportDataProvider';
 import { useSettingStore } from '../stores/settingStore';
 import { useModal } from './useModal';
 
+// TODO: need to debug and test the logic. it pops up too often.
 export default function useRecoveryPrompts() {
   const { loginCount, cloudBackupEnabled, hasViewedRecoveryPhrase } =
     useSettingStore();
@@ -49,9 +50,7 @@ export default function useRecoveryPrompts() {
         }
       }
     }
-    maybePrompt().catch(() => {
-      // Silently fail to avoid breaking the hook
-    });
+    maybePrompt().catch(() => {});
   }, [
     loginCount,
     cloudBackupEnabled,
