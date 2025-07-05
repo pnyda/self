@@ -64,6 +64,7 @@ const MockDataScreenDeepLink: React.FC = () => {
       firstName: storeState.deepLinkName,
       lastName: storeState.deepLinkSurname,
       birthDate: storeState.deepLinkBirthDate,
+      nationality: storeState.deepLinkNationality as any,
     };
     const passportData = genMockIdDocAndInitDataParsing(idDocInput);
     await storePassportData(passportData);
