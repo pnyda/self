@@ -52,6 +52,7 @@ const handleUrl = (uri: string) => {
         surname?: string;
         nationality?: string;
         birth_date?: string;
+        gender?: string;
       };
       const rawParams = data as MockDataDeepLinkRawParams;
 
@@ -60,6 +61,7 @@ const handleUrl = (uri: string) => {
         surname: rawParams.surname,
         nationality: rawParams.nationality,
         birthDate: rawParams.birth_date,
+        gender: rawParams.gender,
       });
 
       navigationRef.navigate('MockDataDeepLink');
