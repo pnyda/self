@@ -16,12 +16,14 @@ const decodeUrl = (encodedUrl: string): string => {
   try {
     return decodeURIComponent(encodedUrl);
   } catch (error) {
-    console.error('Error decoding URL:', error);
+    if (typeof __DEV__ !== 'undefined' && __DEV__) {
+      console.error('Error decoding URL:', error);
+    }
     return encodedUrl;
   }
 };
 
-const handleUrl = (uri: string) => {
+export const handleUrl = (uri: string) => {
   const decodedUri = decodeUrl(uri);
   const encodedData = queryString.parseUrl(decodedUri).query;
   const sessionId = encodedData.sessionId;
@@ -37,7 +39,9 @@ const handleUrl = (uri: string) => {
 
       return;
     } catch (error) {
-      console.error('Error parsing selfApp:', error);
+      if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        console.error('Error parsing selfApp:', error);
+      }
       navigationRef.navigate('QRCodeTrouble');
     }
   } else if (sessionId && typeof sessionId === 'string') {
@@ -66,11 +70,15 @@ const handleUrl = (uri: string) => {
 
       navigationRef.navigate('MockDataDeepLink');
     } catch (error) {
-      console.error('Error parsing mock_passport data or navigating:', error);
+      if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        console.error('Error parsing mock_passport data or navigating:', error);
+      }
       navigationRef.navigate('QRCodeTrouble');
     }
   } else {
-    console.error('No sessionId or selfApp found in the data');
+    if (typeof __DEV__ !== 'undefined' && __DEV__) {
+      console.error('No sessionId or selfApp found in the data');
+    }
     navigationRef.navigate('QRCodeTrouble');
   }
 };
