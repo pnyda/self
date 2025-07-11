@@ -4,5 +4,6 @@
     "lib": ["dom", "esnext"],
     "resolveJsonModule": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": ["node_modules", "vite.config.ts", ".tamagui/*"]
 }
