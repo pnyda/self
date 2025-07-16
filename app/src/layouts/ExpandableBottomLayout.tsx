@@ -4,6 +4,7 @@ import React from 'react';
 import {
   Dimensions,
   PixelRatio,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -56,14 +57,15 @@ const TopSection: React.FC<TopSectionProps> = ({
   ...props
 }) => {
   const { top } = useSafeAreaInsets();
+  const { roundTop, ...restProps } = props;
   return (
     <View
-      {...props}
+      {...restProps}
       backgroundColor={backgroundColor}
       style={[
         styles.topSection,
-        props.roundTop && styles.roundTop,
-        props.roundTop ? { marginTop: top } : { paddingTop: top },
+        roundTop && styles.roundTop,
+        roundTop ? { marginTop: top } : { paddingTop: top },
         { backgroundColor },
       ]}
     >
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
   topSection: {
     alignSelf: 'stretch',
     flexGrow: 1,
-    flexShrink: 1,
+    flexShrink: Platform.select({ web: 0, default: 1 }),
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: black,
