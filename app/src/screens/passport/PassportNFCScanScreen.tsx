@@ -260,13 +260,15 @@ const PassportNFCScanScreen: React.FC<PassportNFCScanScreenProps> = ({}) => {
       }
     }
   }, [
-    isNfcSupported,
     isNfcEnabled,
+    isNfcSupported,
+    route.params,
     passportNumber,
     dateOfBirth,
     dateOfExpiry,
-    route.params,
     isPacePolling,
+    navigation,
+    openErrorModal,
   ]);
 
   const onCancelPress = useHapticNavigation('Launch', {
@@ -277,7 +279,7 @@ const PassportNFCScanScreen: React.FC<PassportNFCScanScreenProps> = ({}) => {
   const _cancelScanIfRunning = useCallback(async () => {
     // // TODO: cancel if scanning
     // setIsNfcSheetOpen(false);
-  }, [isNfcSheetOpen]);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -325,8 +327,8 @@ const PassportNFCScanScreen: React.FC<PassportNFCScanScreenProps> = ({}) => {
               </BodyText>
             </TextsContainer>
             <Image
-              h="$8"
-              w="$8"
+              height="$8"
+              width="$8"
               alignSelf="center"
               borderRadius={1000}
               source={{
@@ -355,20 +357,24 @@ const PassportNFCScanScreen: React.FC<PassportNFCScanScreenProps> = ({}) => {
               </GestureDetector>
               {isNfcEnabled ? (
                 <>
-                  <Title style={styles.title} mt="$2">
+                  <Title style={styles.title} marginTop="$2">
                     Find the RFID chip in your ID
                   </Title>
-                  <BodyText style={styles.bodyText} mt="$2" mb="$2">
+                  <BodyText
+                    style={styles.bodyText}
+                    marginTop="$2"
+                    marginBottom="$2"
+                  >
                     Place your phone against the chip and keep it still until
                     the sensor reads it.
                   </BodyText>
-                  <BodyText style={styles.disclaimer} mt="$2">
+                  <BodyText style={styles.disclaimer} marginTop="$2">
                     SELF DOES NOT STORE THIS INFORMATION.
                   </BodyText>
                 </>
               ) : (
                 <>
-                  <BodyText style={styles.disclaimer} mt="$2">
+                  <BodyText style={styles.disclaimer} marginTop="$2">
                     {dialogMessage}
                   </BodyText>
                 </>
