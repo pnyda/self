@@ -3,7 +3,8 @@
 import 'react-native-get-random-values';
 
 import { Buffer } from 'buffer';
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { YStack } from 'tamagui';
 
 import ErrorBoundary from './src/components/ErrorBoundary';
@@ -11,13 +12,7 @@ import AppNavigation from './src/navigation';
 import { AuthProvider } from './src/providers/authProvider';
 import { DatabaseProvider } from './src/providers/databaseProvider';
 import { NotificationTrackingProvider } from './src/providers/notificationTrackingProvider';
-import LoadingScreen from './src/screens/misc/LoadingScreen';
-
-const PassportProvider = lazy(() =>
-  import('./src/providers/passportDataProvider').then(m => ({
-    default: m.PassportProvider,
-  })),
-);
+import { PassportProvider } from './src/providers/passportDataProvider';
 import { RemoteConfigProvider } from './src/providers/remoteConfigProvider';
 import { initSentry, wrapWithSentry } from './src/Sentry';
 
@@ -27,11 +22,11 @@ global.Buffer = Buffer;
 
 function App(): React.JSX.Element {
   return (
-    <ErrorBoundary>
-      <YStack flex={1} height="100%" width="100%">
-        <RemoteConfigProvider>
-          <AuthProvider>
-            <Suspense fallback={<LoadingScreen />}>
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <YStack flex={1} height="100%" width="100%">
+          <RemoteConfigProvider>
+            <AuthProvider>
               <PassportProvider>
                 <DatabaseProvider>
                   <NotificationTrackingProvider>
@@ -39,11 +34,11 @@ function App(): React.JSX.Element {
                   </NotificationTrackingProvider>
                 </DatabaseProvider>
               </PassportProvider>
-            </Suspense>
-          </AuthProvider>
-        </RemoteConfigProvider>
-      </YStack>
-    </ErrorBoundary>
+            </AuthProvider>
+          </RemoteConfigProvider>
+        </YStack>
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 
