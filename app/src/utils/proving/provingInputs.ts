@@ -7,7 +7,6 @@ import {
   attributeToPosition_ID,
   calculateUserIdentifierHash,
   DEFAULT_MAJORITY,
-  DocumentCategory,
   generateCircuitInputsDSC,
   generateCircuitInputsRegister,
   generateCircuitInputsVCandDisclose,
@@ -15,6 +14,9 @@ import {
   hashEndpointWithScope,
   ID_CARD_ATTESTATION_ID,
   PASSPORT_ATTESTATION_ID,
+} from '@selfxyz/common';
+import type {
+  DocumentCategory,
   PassportData,
   SelfApp,
   SelfAppDisclosureConfig,

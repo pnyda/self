@@ -13,9 +13,8 @@ import {
   ID_CARD_ATTESTATION_ID,
   parseCertificateSimple,
   PASSPORT_ATTESTATION_ID,
-  type PassportData,
 } from '@selfxyz/common';
-import { DocumentCategory } from '@selfxyz/common';
+import { DocumentCategory, PassportData } from '@selfxyz/common';
 import { poseidon2, poseidon5 } from 'poseidon-lite';
 
 import { DocumentEvents } from '../../consts/analytics';
