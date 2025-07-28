@@ -7,12 +7,12 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { Suspense, useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { DefaultNavBar } from '../components/NavBar';
 import AppLayout from '../layouts/AppLayout';
-const SuspenseFallback = () => <div>Loading...</div>;
+const SuspenseFallback = () => <View>Loading...</View>;
 import analytics from '../utils/analytics';
 import { white } from '../utils/colors';
 import { setupUniversalLinkListenerInNavigation } from '../utils/deeplinks';
