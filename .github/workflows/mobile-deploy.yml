@@ -48,6 +48,46 @@ on:
         required: false
         type: boolean
         default: false
+      deployment_track:
+        description: "Deployment track (internal/production)"
+        required: false
+        type: choice
+        default: "internal"
+        options:
+          - internal
+          - production
+      version_bump:
+        description: "Version bump type"
+        required: false
+        type: choice
+        default: "build"
+        options:
+          - build
+          - patch
+          - minor
+          - major
+
+  workflow_call:
+    inputs:
+      platform:
+        type: string
+        required: true
+      deployment_track:
+        type: string
+        required: false
+        default: "internal"
+      version_bump:
+        type: string
+        required: false
+        default: "build"
+      auto_deploy:
+        type: boolean
+        required: false
+        default: false
+      test_mode:
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build-ios:
@@ -381,12 +421,30 @@ jobs:
           echo "Identities in build.keychain:"
           security find-identity -v -p codesigning build.keychain || echo "Failed to find identities in build.keychain"
           echo "--- Starting Fastlane ---"
-          if [ "${{ github.event.inputs.test_mode }}" = "true" ]; then
+
+          # Determine deployment track and version bump
+          DEPLOYMENT_TRACK="${{ inputs.deployment_track || 'internal' }}"
+          VERSION_BUMP="${{ inputs.version_bump || 'build' }}"
+          TEST_MODE="${{ inputs.test_mode || false }}"
+
+          echo "📱 Deployment Configuration:"
+          echo "  - Track: $DEPLOYMENT_TRACK"
+          echo "  - Version Bump: $VERSION_BUMP"
+          echo "  - Test Mode: $TEST_MODE"
+
+          if [ "$TEST_MODE" = "true" ]; then
             echo "🧪 Running in TEST MODE - will skip upload to TestFlight"
-            bundle exec fastlane ios internal_test --verbose test_mode:true
+            bundle exec fastlane ios deploy_auto \
+              deployment_track:$DEPLOYMENT_TRACK \
+              version_bump:$VERSION_BUMP \
+              test_mode:true \
+              --verbose
           else
-            echo "🚀 Uploading to App Store Connect/TestFlight..."
-            bundle exec fastlane ios internal_test --verbose
+            echo "🚀 Deploying to App Store Connect..."
+            bundle exec fastlane ios deploy_auto \
+              deployment_track:$DEPLOYMENT_TRACK \
+              version_bump:$VERSION_BUMP \
+              --verbose
           fi
 
       # Version updates moved to separate job to avoid race conditions
@@ -666,12 +724,30 @@ jobs:
           SLACK_ANNOUNCE_CHANNEL_NAME: ${{ secrets.SLACK_ANNOUNCE_CHANNEL_NAME }}
         run: |
           cd ${{ env.APP_PATH }}
-          if [ "${{ github.event.inputs.test_mode }}" = "true" ]; then
+
+          # Determine deployment track and version bump
+          DEPLOYMENT_TRACK="${{ inputs.deployment_track || 'internal' }}"
+          VERSION_BUMP="${{ inputs.version_bump || 'build' }}"
+          TEST_MODE="${{ inputs.test_mode || false }}"
+
+          echo "🤖 Deployment Configuration:"
+          echo "  - Track: $DEPLOYMENT_TRACK"
+          echo "  - Version Bump: $VERSION_BUMP"
+          echo "  - Test Mode: $TEST_MODE"
+
+          if [ "$TEST_MODE" = "true" ]; then
             echo "🧪 Running in TEST MODE - will skip upload to Play Store"
-            bundle exec fastlane android internal_test --verbose test_mode:true
+            bundle exec fastlane android deploy_auto \
+              deployment_track:$DEPLOYMENT_TRACK \
+              version_bump:$VERSION_BUMP \
+              test_mode:true \
+              --verbose
           else
-            echo "🚀 Uploading to Google Play Internal Testing..."
-            bundle exec fastlane android internal_test --verbose
+            echo "🚀 Deploying to Google Play Store..."
+            bundle exec fastlane android deploy_auto \
+              deployment_track:$DEPLOYMENT_TRACK \
+              version_bump:$VERSION_BUMP \
+              --verbose
           fi
 
       # Version updates moved to separate job to avoid race conditions
@@ -799,3 +875,100 @@ jobs:
             git push
             echo "✅ Committed version file changes"
           fi
+
+  # Create git tags after successful deployment
+  create-release-tags:
+    needs: [build-ios, build-android, update-version-files]
+    if: |
+      always() &&
+      needs.update-version-files.result == 'success' &&
+      (needs.build-ios.result == 'success' || needs.build-android.result == 'success') &&
+      (inputs.deployment_track == 'production' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deployment_track == 'production'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Create and push tags
+        run: |
+          cd ${{ env.APP_PATH }}
+
+          # Read current version info
+          VERSION=$(cat package.json | jq -r .version)
+          IOS_BUILD=$(cat version.json | jq -r .ios.build)
+          ANDROID_BUILD=$(cat version.json | jq -r .android.build)
+
+          echo "📦 Creating tags for version $VERSION"
+
+          # Create main version tag
+          if ! git tag -l | grep -q "^v${VERSION}$"; then
+            git tag -a "v${VERSION}" -m "Release ${VERSION}"
+            echo "✅ Created tag: v${VERSION}"
+          else
+            echo "⏭️  Tag v${VERSION} already exists"
+          fi
+
+          # Create platform-specific tags if deployments succeeded
+          if [ "${{ needs.build-ios.result }}" = "success" ]; then
+            TAG_NAME="v${VERSION}-ios-${IOS_BUILD}"
+            if ! git tag -l | grep -q "^${TAG_NAME}$"; then
+              git tag -a "${TAG_NAME}" -m "iOS Release ${VERSION} (Build ${IOS_BUILD})"
+              echo "✅ Created tag: ${TAG_NAME}"
+            fi
+          fi
+
+          if [ "${{ needs.build-android.result }}" = "success" ]; then
+            TAG_NAME="v${VERSION}-android-${ANDROID_BUILD}"
+            if ! git tag -l | grep -q "^${TAG_NAME}$"; then
+              git tag -a "${TAG_NAME}" -m "Android Release ${VERSION} (Build ${ANDROID_BUILD})"
+              echo "✅ Created tag: ${TAG_NAME}"
+            fi
+          fi
+
+          # Push all tags
+          git push origin --tags
+          echo "🚀 Tags pushed to repository"
+
+      - name: Generate changelog for release
+        id: changelog
+        run: |
+          cd ${{ env.APP_PATH }}
+
+          # Find the previous version tag
+          PREV_TAG=$(git tag -l "v*" | grep -v "-" | sort -V | tail -2 | head -1 || echo "")
+
+          # Generate simple changelog
+          echo "## What's Changed" > release_notes.md
+          echo "" >> release_notes.md
+
+          if [ -n "$PREV_TAG" ]; then
+            git log --pretty=format:"- %s" ${PREV_TAG}..HEAD --no-merges | grep -v "^- Merge" >> release_notes.md
+          else
+            echo "Initial release" >> release_notes.md
+          fi
+
+          echo "" >> release_notes.md
+          echo "## Build Information" >> release_notes.md
+          echo "- iOS Build: ${IOS_BUILD}" >> release_notes.md
+          echo "- Android Build: ${ANDROID_BUILD}" >> release_notes.md
+
+          # Set output for next step
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.changelog.outputs.version }}
+          name: Release ${{ steps.changelog.outputs.version }}
+          body_path: ${{ env.APP_PATH }}/release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
