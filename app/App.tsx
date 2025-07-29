@@ -5,6 +5,7 @@ import 'react-native-get-random-values';
 
 import { Buffer } from 'buffer';
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { YStack } from 'tamagui';
 
 import ErrorBoundary from './src/components/ErrorBoundary';
@@ -22,21 +23,23 @@ global.Buffer = Buffer;
 
 function App(): React.JSX.Element {
   return (
-    <ErrorBoundary>
-      <YStack flex={1} height="100%" width="100%">
-        <RemoteConfigProvider>
-          <AuthProvider>
-            <PassportProvider>
-              <DatabaseProvider>
-                <NotificationTrackingProvider>
-                  <AppNavigation />
-                </NotificationTrackingProvider>
-              </DatabaseProvider>
-            </PassportProvider>
-          </AuthProvider>
-        </RemoteConfigProvider>
-      </YStack>
-    </ErrorBoundary>
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <YStack flex={1} height="100%" width="100%">
+          <RemoteConfigProvider>
+            <AuthProvider>
+              <PassportProvider>
+                <DatabaseProvider>
+                  <NotificationTrackingProvider>
+                    <AppNavigation />
+                  </NotificationTrackingProvider>
+                </DatabaseProvider>
+              </PassportProvider>
+            </AuthProvider>
+          </RemoteConfigProvider>
+        </YStack>
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 
