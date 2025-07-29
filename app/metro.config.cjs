@@ -48,7 +48,9 @@ const config = {
     // Custom resolver to handle .js imports that should resolve to .ts files
     resolveRequest: (context, moduleName, platform) => {
       // Only process .js imports from the common package source
-      const isFromCommonSrc = context.originModulePath.includes(path.join('common', 'src'));
+      const isFromCommonSrc = context.originModulePath.includes(
+        path.join('common', 'src'),
+      );
       if (moduleName.endsWith('.js') && isFromCommonSrc) {
         const tsModuleName = moduleName.replace(/\.js$/, '.ts');
         const tsxModuleName = moduleName.replace(/\.js$/, '.tsx');
