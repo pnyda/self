@@ -131,7 +131,7 @@ export async function checkIfPassportDscIsInTree(
   passportData: PassportData,
   dscTree: string,
 ): Promise<boolean> {
-  const hashFunction = (a: any, b: any) => poseidon2([a, b]);
+  const hashFunction = (a: bigint, b: bigint) => poseidon2([a, b]);
   const tree = LeanIMT.import(hashFunction, dscTree);
   const leaf = getLeafDscTree(
     passportData.dsc_parsed!,
@@ -399,20 +399,23 @@ export async function isUserRegisteredWithAlternativeCSCA(
   return { isRegistered: false, csca: null };
 }
 
+interface MigratedPassportData extends Omit<PassportData, 'documentType'> {
+  documentType?: string;
+}
+
 export function migratePassportData(passportData: PassportData): PassportData {
-  const migratedData = { ...passportData } as any;
+  const migratedData: MigratedPassportData = { ...passportData };
   if (!('documentCategory' in migratedData) || !('mock' in migratedData)) {
-    if ('documentType' in migratedData && migratedData.documentType) {
-      migratedData.mock = migratedData.documentType.startsWith('mock');
-      migratedData.documentCategory = migratedData.documentType.includes(
-        'passport',
-      )
+    const documentType = (migratedData as any).documentType;
+    if (documentType) {
+      (migratedData as any).mock = documentType.startsWith('mock');
+      (migratedData as any).documentCategory = documentType.includes('passport')
         ? 'passport'
         : 'id_card';
     } else {
-      migratedData.documentType = 'passport';
-      migratedData.documentCategory = 'passport';
-      migratedData.mock = false;
+      (migratedData as any).documentType = 'passport';
+      (migratedData as any).documentCategory = 'passport';
+      (migratedData as any).mock = false;
     }
     // console.log('Migrated passport data:', migratedData);
   }

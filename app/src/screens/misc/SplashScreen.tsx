@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 
 import splashAnimation from '../../assets/animations/splash.json';
+import type { RootStackParamList } from '../../navigation';
 import { useAuth } from '../../providers/authProvider';
 import {
   checkAndUpdateRegistrationStates,
@@ -18,13 +19,17 @@ import { black } from '../../utils/colors';
 import { impactLight } from '../../utils/haptic';
 
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const SplashScreen: React.FC = ({}) => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { checkBiometricsAvailable } = useAuth();
   const { setBiometricsAvailable } = useSettingStore();
   const [isAnimationFinished, setIsAnimationFinished] = useState(false);
-  const [nextScreen, setNextScreen] = useState<string | null>(null);
+  const [nextScreen, setNextScreen] = useState<keyof RootStackParamList | null>(
+    null,
+  );
   const dataLoadInitiatedRef = useRef(false);
 
   useEffect(() => {
@@ -74,7 +79,7 @@ const SplashScreen: React.FC = ({}) => {
   useEffect(() => {
     if (isAnimationFinished && nextScreen) {
       requestAnimationFrame(() => {
-        navigation.navigate(nextScreen as any);
+        navigation.navigate(nextScreen as never);
       });
     }
   }, [isAnimationFinished, nextScreen, navigation]);

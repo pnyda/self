@@ -4,7 +4,7 @@ import forge from 'node-forge';
 import type { Socket } from 'socket.io-client';
 import socketIo from 'socket.io-client';
 import { v4 } from 'uuid';
-import type { AnyActorRef } from 'xstate';
+import type { AnyActorRef, StateFrom } from 'xstate';
 import { createActor, createMachine } from 'xstate';
 import { create } from 'zustand';
 
@@ -160,14 +160,14 @@ export const getPostVerificationRoute = () => {
 
 interface ProvingState {
   currentState: ProvingStateType;
-  attestation: any;
+  attestation: number[] | null;
   serverPublicKey: string | null;
   sharedKey: Buffer | null;
   wsConnection: WebSocket | null;
   socketConnection: Socket | null;
   uuid: string | null;
   userConfirmed: boolean;
-  passportData: any | null;
+  passportData: PassportData | null;
   secret: string | null;
   circuitType: provingMachineCircuitType | null;
   error_code: string | null;
@@ -187,7 +187,7 @@ interface ProvingState {
   postProving: () => void;
   setUserConfirmed: () => void;
   _closeConnections: () => void;
-  _generatePayload: () => Promise<any>;
+  _generatePayload: () => Promise<unknown>;
   _handleWebSocketMessage: (event: MessageEvent) => Promise<void>;
   _handleRegisterErrorOrFailure: () => void;
   _startSocketIOStatusListener: (
@@ -203,7 +203,8 @@ export const useProvingStore = create<ProvingState>((set, get) => {
   let actor: AnyActorRef | null = null;
 
   function setupActorSubscriptions(newActor: AnyActorRef) {
-    newActor.subscribe((state: any) => {
+    newActor.subscribe((state: StateFrom<typeof provingMachine>) => {
+      console.log(`State transition: ${state.value}`);
       trackEvent(ProofEvents.PROVING_STATE_CHANGE, { state: state.value });
       set({ currentState: state.value as ProvingStateType });
 
@@ -395,12 +396,12 @@ export const useProvingStore = create<ProvingState>((set, get) => {
         console.error('Error processing WebSocket message:', error);
         if (get().currentState === 'init_tee_connexion') {
           trackEvent(ProofEvents.TEE_CONN_FAILED, {
-            message: (error as any).message,
+            message: error instanceof Error ? error.message : String(error),
           });
           actor!.send({ type: 'CONNECT_ERROR' });
         } else {
           trackEvent(ProofEvents.TEE_WS_ERROR, {
-            error: (error as any).message,
+            error: error instanceof Error ? error.message : String(error),
           });
           trackEvent(ProofEvents.PROOF_FAILED, {
             circuitType: get().circuitType,
@@ -453,7 +454,7 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       socket.on('connect_error', error => {
         console.error('SocketIO connection error:', error);
         trackEvent(ProofEvents.SOCKETIO_CONNECT_ERROR, {
-          message: (error as any).message,
+          message: error instanceof Error ? error.message : String(error),
         });
         trackEvent(ProofEvents.PROOF_FAILED, {
           circuitType: get().circuitType,
@@ -480,7 +481,7 @@ export const useProvingStore = create<ProvingState>((set, get) => {
         set({ socketConnection: null });
       });
 
-      socket.on('status', (message: any) => {
+      socket.on('status', (message: unknown) => {
         const data =
           typeof message === 'string' ? JSON.parse(message) : message;
         trackEvent(ProofEvents.SOCKETIO_STATUS_RECEIVED, {
@@ -653,6 +654,9 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       trackEvent(ProofEvents.FETCH_DATA_STARTED);
       try {
         const { passportData, env } = get();
+        if (!passportData) {
+          throw new Error('PassportData is not available');
+        }
         const document: DocumentCategory = passportData.documentCategory;
         await useProtocolStore
           .getState()
@@ -664,7 +668,7 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       } catch (error) {
         console.error('Error fetching data:', error);
         trackEvent(ProofEvents.FETCH_DATA_FAILED, {
-          message: (error as any).message,
+          message: error instanceof Error ? error.message : String(error),
         });
         actor!.send({ type: 'FETCH_ERROR' });
       }
@@ -676,6 +680,9 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       trackEvent(ProofEvents.VALIDATION_STARTED);
       try {
         const { passportData, secret, circuitType } = get();
+        if (!passportData) {
+          throw new Error('PassportData is not available');
+        }
         const isSupported = await checkPassportSupported(passportData);
         if (isSupported.status !== 'passport_supported') {
           console.error(
@@ -757,14 +764,17 @@ export const useProvingStore = create<ProvingState>((set, get) => {
       } catch (error) {
         console.error('Error validating passport:', error);
         trackEvent(ProofEvents.VALIDATION_FAILED, {
-          message: (error as any).message,
+          message: error instanceof Error ? error.message : String(error),
         });
         actor!.send({ type: 'VALIDATION_ERROR' });
       }
     },
 
     initTeeConnection: async (): Promise<boolean> => {
-      const { passportData }: { passportData: PassportData } = get();
+      const { passportData } = get();
+      if (!passportData) {
+        throw new Error('PassportData is not available');
+      }
       const document: DocumentCategory = passportData.documentCategory;
       const circuitsMapping =
         useProtocolStore.getState()[document].circuits_dns_mapping;
@@ -877,7 +887,7 @@ export const useProvingStore = create<ProvingState>((set, get) => {
           } catch (error) {
             console.error('Error registering device token:', error);
             trackEvent(ProofEvents.DEVICE_TOKEN_REG_FAILED, {
-              message: (error as any).message,
+              message: error instanceof Error ? error.message : String(error),
             });
             // Continue with the proving process even if token registration fails
           }
@@ -962,6 +972,9 @@ export const useProvingStore = create<ProvingState>((set, get) => {
 
     _generatePayload: async () => {
       const { circuitType, passportData, secret, uuid, sharedKey, env } = get();
+      if (!passportData) {
+        throw new Error('PassportData is not available');
+      }
       const document: DocumentCategory = passportData.documentCategory;
       const selfApp = useSelfAppStore.getState().selfApp;
       // TODO: according to the circuitType we could check that the params are valid.
