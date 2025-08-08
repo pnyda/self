@@ -1,19 +1,17 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "lib": ["dom", "esnext"],
-    "module": "esnext",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
     "paths": {
       "@env": ["./env.ts"],
       "@selfxyz/common": ["../common"],
       "@selfxyz/common/*": ["../common/*"],
       "@src": ["./src"],
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"],
+      "@tests": ["./tests/src"],
+      "@tests/*": ["./tests/src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["tests/**/*", "src/**/*"],
   "exclude": [
     "*.config.cjs",
     "*.config.js",
@@ -43,7 +41,6 @@
     "metro.config.cjs",
     "node_modules",
     "scripts/**/*",
-    "tests/**/*",
     "vendor/**/*",
     "vite.config.ts",
     "web/**/*"
