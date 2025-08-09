@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: BUSL-1.1; Copyright (c) 2025 Social Connect Labs, Inc.; Licensed under BUSL-1.1 (see LICENSE); Apache-2.0 from 2029-06-11
 
 import React, { useCallback } from 'react';
-import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
-import { PixelRatio, Platform, requireNativeComponent } from 'react-native';
+import {
+  type NativeSyntheticEvent,
+  PixelRatio,
+  Platform,
+  requireNativeComponent,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+
+import { extractMRZInfo } from '@selfxyz/sdk-alpha';
 
 import { RCTFragment } from '@src/components/native/RCTFragment';
-import { extractMRZInfo } from '@src/utils/utils';
 
 interface NativePassportOCRViewProps {
   onPassportRead: (

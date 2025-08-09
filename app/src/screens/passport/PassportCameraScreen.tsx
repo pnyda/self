@@ -5,6 +5,8 @@ import React, { useCallback, useRef } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { View, XStack, YStack } from 'tamagui';
 
+import { formatDateToYYMMDD } from '@selfxyz/sdk-alpha';
+
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import passportScanAnimation from '@src/assets/animations/passport_scan.json';
 import { SecondaryButton } from '@src/components/buttons/SecondaryButton';
@@ -22,7 +24,7 @@ import analytics from '@src/utils/analytics';
 import { black, slate400, slate800, white } from '@src/utils/colors';
 import { dinot } from '@src/utils/fonts';
 import { hasAnyValidRegisteredDocument } from '@src/utils/proving/validateDocument';
-import { checkScannedInfo, formatDateToYYMMDD } from '@src/utils/utils';
+import { checkScannedInfo } from '@src/utils/utils';
 
 interface PassportNFCScanScreen {}
 
