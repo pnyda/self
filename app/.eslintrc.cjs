@@ -54,23 +54,25 @@ module.exports = {
       {
         groups: [
           // Node.js built-ins
-
           ['^node:'],
           ['^node:.*/'],
-          // External packages
 
-          ['^[a-zA-Z]'],
+          // External packages (including @-prefixed external packages)
+          ['^[a-zA-Z]', '^@(?!selfxyz|/)'],
+
           // Internal workspace packages
-
           ['^@selfxyz/'],
-          // Internal relative imports
 
+          // Internal alias imports (new @/ alias)
+          ['^@/'],
+
+          // Internal relative imports
           ['^[./]'],
         ],
       },
     ],
 
-    // Export sorting - using sort-exports for better type prioritization
+    // Export sorting
 
     'sort-exports/sort-exports': [
       'error',
@@ -168,6 +170,20 @@ module.exports = {
   },
   overrides: [
     {
+      // Disable export sorting for files with dependency issues
+      files: [
+        'src/components/NavBar/BaseNavBar.tsx',
+        'src/navigation/index.tsx',
+        'src/providers/passportDataProvider.tsx',
+        'src/utils/cloudBackup/helpers.ts',
+        'src/utils/haptic/index.ts',
+        'src/utils/proving/provingUtils.ts',
+      ],
+      rules: {
+        'sort-exports/sort-exports': 'off',
+      },
+    },
+    {
       files: ['tests/**/*.{ts,tsx}'],
       parserOptions: {
         project: './tsconfig.test.json',
@@ -199,20 +215,6 @@ module.exports = {
         'header/header': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         'no-undef': 'off',
-      },
-    },
-    {
-      // Disable export sorting for files with dependency issues
-      files: [
-        'src/components/NavBar/BaseNavBar.tsx',
-        'src/navigation/index.tsx',
-        'src/providers/passportDataProvider.tsx',
-        'src/utils/cloudBackup/helpers.ts',
-        'src/utils/haptic/index.ts',
-        'src/utils/proving/provingUtils.ts',
-      ],
-      rules: {
-        'sort-exports/sort-exports': 'off',
       },
     },
   ],
