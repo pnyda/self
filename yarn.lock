@@ -4925,7 +4925,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@selfxyz/common@workspace:^, @selfxyz/common@workspace:common":
+"@selfxyz/common@workspace:*, @selfxyz/common@workspace:^, @selfxyz/common@workspace:common":
   version: 0.0.0-use.local
   resolution: "@selfxyz/common@workspace:common"
   dependencies:
@@ -5189,6 +5189,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@selfxyz/mobile-sdk-alpha@workspace:packages/mobile-sdk-alpha"
   dependencies:
+    "@selfxyz/common": "workspace:*"
     "@typescript-eslint/eslint-plugin": "npm:^8.0.0"
     "@typescript-eslint/parser": "npm:^8.0.0"
     eslint: "npm:^8.57.0"
