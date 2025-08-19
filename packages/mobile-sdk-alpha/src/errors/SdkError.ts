@@ -1,16 +1,21 @@
-// Add ErrorOptions interface for TypeScript compatibility
 interface ErrorOptions {
   cause?: unknown;
 }
 
-export type SdkErrorCategory = 'scanner' | 'network' | 'protocol' | 'proof' | 'crypto' | 'validation' | 'config';
+export type SdkErrorCategory =
+  | 'scanner'
+  | 'network'
+  | 'protocol'
+  | 'proof'
+  | 'crypto'
+  | 'validation'
+  | 'config'
+  | 'init'
+  | 'liveness';
 
-export const SCANNER_ERROR_CODES = {
-  UNAVAILABLE: 'SELF_ERR_SCANNER_UNAVAILABLE',
-  NFC_NOT_SUPPORTED: 'SELF_ERR_NFC_NOT_SUPPORTED',
-  INVALID_MODE: 'SELF_ERR_SCANNER_MODE',
-} as const;
-
+/**
+ * Base class for all SDK errors.
+ */
 export class SdkError extends Error {
   readonly code: string;
   readonly category: SdkErrorCategory;
@@ -29,10 +34,25 @@ export class SdkError extends Error {
   }
 }
 
+/**
+ * Helper to create an SDK error for an adapter that has not been provided.
+ *
+ * @param name - human-readable adapter name.
+ * @returns configured {@link SdkError} instance.
+ */
 export function notImplemented(name: string) {
   return new SdkError(`${name} adapter not provided`, 'SELF_ERR_ADAPTER_MISSING', 'config', false);
 }
 
+/**
+ * Convenience factory for {@link SdkError}.
+ *
+ * @param message - error description.
+ * @param code - unique error code.
+ * @param category - high level error category.
+ * @param retryable - whether the operation may be retried.
+ * @returns configured {@link SdkError} instance.
+ */
 export function sdkError(message: string, code: string, category: SdkErrorCategory, retryable = false) {
   return new SdkError(message, code, category, retryable);
 }
