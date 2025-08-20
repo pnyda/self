@@ -46,12 +46,19 @@ export const HomeNavBar = (props: NativeStackHeaderProps) => {
         console.log('Consume token selfApp:', selfApp);
         useSelfAppStore.getState().setSelfApp(selfApp);
         useSelfAppStore.getState().startAppListener(selfApp.sessionId);
-        try { Clipboard.setString(''); } catch {}
+        try {
+          Clipboard.setString('');
+        } catch {}
         props.navigation.navigate('ProveScreen');
       } catch (error) {
         console.error('Error consuming token:', error);
-        if (error instanceof Error && error.message.includes('Token not found or expired')) {
-          try { Clipboard.setString(''); } catch {}
+        if (
+          error instanceof Error &&
+          error.message.includes('Token not found or expired')
+        ) {
+          try {
+            Clipboard.setString('');
+          } catch {}
           props.navigation.navigate('DeferredLinkingInfo');
         }
       }

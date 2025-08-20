@@ -28,7 +28,9 @@ const DeferredLinkingInfoScreen: React.FC = () => {
             Self deferred linking. This will copy the request to your clipboard.
           </Description>
           <Description style={{ textAlign: 'left', marginTop: 10 }}>
-            Right now, the clipboard is empty or what's inside is not related to Self. You may also see this if your token was already consumed or has expired.
+            Right now, the clipboard is empty or what's inside is not related to
+            Self. You may also see this if your token was already consumed or
+            has expired.
           </Description>
           <PrimaryButton
             style={{ marginVertical: 30 }}
