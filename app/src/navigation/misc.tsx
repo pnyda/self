@@ -13,6 +13,9 @@ import { black } from '@/utils/colors';
 const LaunchScreen = lazy(() => import('@/screens/misc/LaunchScreen'));
 const LoadingScreen = lazy(() => import('@/screens/misc/LoadingScreen'));
 const ModalScreen = lazy(() => import('@/screens/misc/ModalScreen'));
+const DeferredLinkingInfoScreen = lazy(
+  () => import('@/screens/misc/DeferredLinkingInfoScreen'),
+);
 
 const miscScreens = {
   Launch: {
@@ -35,6 +38,13 @@ const miscScreens = {
       headerShown: false,
       presentation: 'transparentModal',
       animation: 'fade',
+      contentStyle: { backgroundColor: 'transparent' },
+    } as NativeStackNavigationOptions,
+  },
+  DeferredLinkingInfo: {
+    screen: DeferredLinkingInfoScreen,
+    options: {
+      headerShown: false,
     } as NativeStackNavigationOptions,
   },
 

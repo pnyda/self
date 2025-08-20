@@ -7,6 +7,8 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { Clipboard as ClipboardIcon } from '@tamagui/lucide-icons';
 
+import type { SelfApp } from '@selfxyz/common/utils/appType';
+
 import { NavBar } from '@/components/NavBar/BaseNavBar';
 import ActivityIcon from '@/images/icons/activity.svg';
 import SettingsIcon from '@/images/icons/settings.svg';
@@ -22,6 +24,11 @@ export const HomeNavBar = (props: NativeStackHeaderProps) => {
     console.log('Consume token content:', content);
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!content || !uuidRegex.test(content)) {
+      console.log('Invalid clipboard content');
+      props.navigation.navigate('DeferredLinkingInfo');
+      return;
+    }
     if (uuidRegex.test(content)) {
       try {
         const response = await fetch(
@@ -35,13 +42,18 @@ export const HomeNavBar = (props: NativeStackHeaderProps) => {
             `Failed to consume token: ${result.message || 'Unknown error'}`,
           );
         }
-        const selfApp = JSON.parse(result.data.self_app);
+        const selfApp: SelfApp = JSON.parse(result.data.self_app);
         console.log('Consume token selfApp:', selfApp);
         useSelfAppStore.getState().setSelfApp(selfApp);
         useSelfAppStore.getState().startAppListener(selfApp.sessionId);
+        try { Clipboard.setString(''); } catch {}
         props.navigation.navigate('ProveScreen');
       } catch (error) {
         console.error('Error consuming token:', error);
+        if (error instanceof Error && error.message.includes('Token not found or expired')) {
+          try { Clipboard.setString(''); } catch {}
+          props.navigation.navigate('DeferredLinkingInfo');
+        }
       }
     } else {
       console.log('Clipboard content is not a UUID');
