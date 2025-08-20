@@ -1,6 +1,7 @@
 import { defaultConfig } from './config/defaults';
 import { mergeConfig } from './config/merge';
 import { notImplemented } from './errors';
+import { extractMRZInfo as parseMRZInfo } from './processing/mrz';
 import type {
   Adapters,
   Config,
@@ -19,6 +20,11 @@ import type {
   ValidationResult,
 } from './types/public';
 
+/**
+ * Optional adapter implementations used when a consumer does not provide their
+ * own. These defaults are intentionally minimal no-ops suitable for tests and
+ * non-production environments.
+ */
 const optionalDefaults: Partial<Adapters> = {
   storage: {
     get: async () => null,
@@ -36,6 +42,13 @@ const optionalDefaults: Partial<Adapters> = {
   },
 };
 
+/**
+ * Creates a fully configured {@link SelfClient} instance.
+ *
+ * The function validates that all required adapters are supplied and merges the
+ * provided configuration with sensible defaults. Missing optional adapters are
+ * filled with benign no-op implementations.
+ */
 export function createSelfClient({ config, adapters }: { config: Config; adapters: Partial<Adapters> }): SelfClient {
   const cfg = mergeConfig(defaultConfig, config);
   const required: (keyof Adapters)[] = ['scanner', 'network', 'crypto'];
@@ -77,6 +90,10 @@ export function createSelfClient({ config, adapters }: { config: Config; adapter
     return { registered: false, reason: 'SELF_REG_STATUS_STUB' };
   }
 
+  async function registerDocument(_input: RegistrationInput): Promise<RegistrationStatus> {
+    return { registered: false, reason: 'SELF_REG_STATUS_STUB' };
+  }
+
   async function generateProof(
     _req: ProofRequest,
     opts: {
@@ -101,7 +118,9 @@ export function createSelfClient({ config, adapters }: { config: Config; adapter
     scanDocument,
     validateDocument,
     checkRegistration,
+    registerDocument,
     generateProof,
+    extractMRZInfo: parseMRZInfo,
     on,
     emit,
   };

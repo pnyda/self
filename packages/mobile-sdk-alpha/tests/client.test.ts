@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { CryptoAdapter, NetworkAdapter, ScannerAdapter } from '../src/adapters/index';
+import type { CryptoAdapter, NetworkAdapter, ScannerAdapter } from '../src';
 import { createSelfClient } from '../src/index';
 
 describe('createSelfClient', () => {
@@ -76,6 +76,22 @@ describe('createSelfClient', () => {
     unsub();
     eventSet?.forEach(fn => fn({ step: 'two' }));
     expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('parses MRZ via client', () => {
+    const client = createSelfClient({ config: {}, adapters: { scanner, network, crypto } });
+    const sample = `P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10`;
+    const info = client.extractMRZInfo(sample);
+    expect(info.passportNumber).toBe('L898902C3');
+    expect(info.validation.overall).toBe(true);
+  });
+
+  it('returns stub registration status', async () => {
+    const client = createSelfClient({ config: {}, adapters: { scanner, network, crypto } });
+    await expect(client.registerDocument({} as any)).resolves.toEqual({
+      registered: false,
+      reason: 'SELF_REG_STATUS_STUB',
+    });
   });
 });
 
