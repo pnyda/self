@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
 import { PixelRatio, Platform, requireNativeComponent } from 'react-native';
 
-import { extractMRZInfo } from '@selfxyz/mobile-sdk-alpha';
+import { type SelfClient, useSelfClient } from '@selfxyz/mobile-sdk-alpha';
 
 import { RCTFragment } from '@/components/native/RCTFragment';
 
@@ -47,7 +47,7 @@ export interface PassportCameraProps {
   isMounted: boolean;
   onPassportRead: (
     error: Error | null,
-    mrzData?: ReturnType<typeof extractMRZInfo>,
+    mrzData?: ReturnType<SelfClient['extractMRZInfo']>,
   ) => void;
 }
 
@@ -55,6 +55,7 @@ export const PassportCamera: React.FC<PassportCameraProps> = ({
   onPassportRead,
   isMounted,
 }) => {
+  const selfClient = useSelfClient();
   const _onError = useCallback(
     (
       event: NativeSyntheticEvent<{
@@ -93,7 +94,7 @@ export const PassportCamera: React.FC<PassportCameraProps> = ({
         return;
       }
       if (typeof event.nativeEvent.data === 'string') {
-        onPassportRead(null, extractMRZInfo(event.nativeEvent.data));
+        onPassportRead(null, selfClient.extractMRZInfo(event.nativeEvent.data));
       } else {
         onPassportRead(null, {
           passportNumber: event.nativeEvent.data.documentNumber,
@@ -117,7 +118,7 @@ export const PassportCamera: React.FC<PassportCameraProps> = ({
         });
       }
     },
-    [onPassportRead, isMounted],
+    [onPassportRead, isMounted, selfClient],
   );
 
   if (Platform.OS === 'ios') {

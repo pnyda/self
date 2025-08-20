@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1; Copyright (c) 2025 Social Connect Labs, Inc.; Licensed under BUSL-1.1 (see LICENSE); Apache-2.0 from 2029-06-11
+
 import type { PassportData } from '@selfxyz/common/types';
 import { isPassportDataValid } from '@selfxyz/mobile-sdk-alpha';
 
@@ -50,6 +51,41 @@ jest.mock('@/stores/protocolStore', () => ({
     })),
   },
 }));
+
+/**
+ * Creates a Self SDK client with minimal mock adapters for tests.
+ */
+function createTestClient() {
+  const { createSelfClient } = require('@selfxyz/mobile-sdk-alpha');
+  return createSelfClient({
+    config: {},
+    adapters: {
+      scanner: { scan: jest.fn() },
+      network: {
+        http: { fetch: jest.fn() },
+        ws: {
+          connect: jest.fn(() => ({
+            send: jest.fn(),
+            close: jest.fn(),
+            onMessage: jest.fn(),
+            onError: jest.fn(),
+            onClose: jest.fn(),
+          })),
+        },
+      },
+      crypto: {
+        hash: jest.fn(),
+        sign: jest.fn(),
+      },
+    },
+  });
+}
+
+/** Sample ICAO-compliant MRZ string for parsing tests. */
+const validMrz = `P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10`;
+
+/** Intentionally malformed MRZ string to exercise error handling. */
+const invalidMrz = 'NOT_A_VALID_MRZ';
 
 describe('validateDocument - Real mobile-sdk-alpha Integration (PII-safe)', () => {
   it('should use the real isPassportDataValid function with synthetic passport data', () => {
@@ -132,16 +168,20 @@ describe('validateDocument - Real mobile-sdk-alpha Integration (PII-safe)', () =
     expect(callbacks.onPassportMetadataNull).toHaveBeenCalled();
   });
 
-  it('should import and use real mobile-sdk-alpha exports', () => {
-    // Verify that we can import other exports from the real package (using synthetic data)
-    const {
-      createSelfClient,
-      defaultConfig,
-      extractMRZInfo,
-    } = require('@selfxyz/mobile-sdk-alpha');
+  it('should expose extractMRZInfo via a self client instance', () => {
+    const client = createTestClient();
+    expect(typeof client.extractMRZInfo).toBe('function');
+  });
 
-    expect(typeof createSelfClient).toBe('function');
-    expect(typeof defaultConfig).toBe('object');
-    expect(typeof extractMRZInfo).toBe('function');
+  it('parses a valid MRZ string', () => {
+    const client = createTestClient();
+    const info = client.extractMRZInfo(validMrz);
+    expect(info.passportNumber).toBe('L898902C3');
+    expect(info.validation.overall).toBe(true);
+  });
+
+  it('throws on malformed MRZ input', () => {
+    const client = createTestClient();
+    expect(() => client.extractMRZInfo(invalidMrz)).toThrow();
   });
 });
