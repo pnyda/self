@@ -88,8 +88,8 @@
     "@size-limit/preset-big-lib": "^11.2.0",
     "@types/node": "^22.0.0",
     "@types/node-forge": "^1",
-    "@types/react": "^18.3.4",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.1.1",
+    "@types/react-dom": "^19.1.1",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
@@ -102,8 +102,8 @@
     "eslint-plugin-sort-exports": "^0.9.1",
     "mocha": "^10.7.3",
     "prettier": "^3.5.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "size-limit": "^11.2.0",
     "ts-loader": "^9.5.1",
     "ts-mocha": "^10.0.0",
@@ -113,8 +113,8 @@
   },
   "peerDependencies": {
     "lottie-react": "^2.4.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "engines": {
     "node": ">=22 <23"
